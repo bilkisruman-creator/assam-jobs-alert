@@ -57,15 +57,17 @@ export function SiteFooter() {
 
   const categories = [
     { name: 'Latest Jobs', slug: 'latest-jobs' },
-    { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs' },
-    { name: 'State Govt Jobs', slug: 'state-government-jobs' },
-    { name: 'Central Govt Jobs', slug: 'central-govt-jobs' },
     { name: 'Results', slug: 'results' },
     { name: 'Admit Cards', slug: 'admit-cards' },
     { name: 'Admissions', slug: 'admissions' },
     { name: 'Scholarships', slug: 'scholarships' },
-    { name: 'Answer Key', slug: 'answer-key' },
+    { name: 'Assam Govt', slug: 'assam-govt-jobs' },
+    { name: 'Central Govt', slug: 'central-govt-jobs' },
+    { name: 'Defence', slug: 'defence-jobs' },
+    { name: 'Bank Jobs', slug: 'bank-jobs' },
+    { name: 'Private Jobs', slug: 'private-jobs' },
     { name: 'Syllabus', slug: 'syllabus' },
+    { name: 'Answer Key', slug: 'answer-key' },
   ];
 
   const quickLinks = [

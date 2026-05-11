@@ -40,6 +40,8 @@ async function main() {
     { name: 'Private Jobs', slug: 'private-jobs', icon: 'Building', color: '#be185d', order: 13, description: 'Private sector job opportunities in Assam' },
     { name: 'Walk-in Interviews', slug: 'walk-in-interviews', icon: 'Users', color: '#65a30d', order: 14, description: 'Walk-in interview schedules and details' },
     { name: 'State Government Jobs', slug: 'state-government-jobs', icon: 'MapPin', color: '#0d9488', order: 15, description: 'All state government job notifications across India' },
+    { name: 'Defence Jobs', slug: 'defence-jobs', icon: 'Shield', color: '#b45309', order: 16, description: 'Defence sector job notifications - Army, Navy, Air Force' },
+    { name: 'Bank Jobs', slug: 'bank-jobs', icon: 'Landmark', color: '#c026d3', order: 17, description: 'Banking sector job notifications - IBPS, SBI, RBI' },
   ];
 
   const createdCategories = [];

@@ -97,7 +97,9 @@ const quickCategories = [
   { name: 'Central Govt', slug: 'central-govt-jobs', color: '#1d4ed8' },
   { name: 'Defence', slug: 'defence-jobs', color: '#b45309' },
   { name: 'Bank Jobs', slug: 'bank-jobs', color: '#c026d3' },
+  { name: 'Private Jobs', slug: 'private-jobs', color: '#be185d' },
   { name: 'Syllabus', slug: 'syllabus', color: '#6d28d9' },
+  { name: 'Answer Key', slug: 'answer-key', color: '#059669' },
 ];
 
 const sections: SectionConfig[] = [
@@ -208,25 +210,6 @@ export default function HomePage() {
         <HeroSlider />
       </section>
 
-      {/* Quick Category Pills */}
-      <section className="max-w-7xl mx-auto px-4 mt-5">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {quickCategories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/category/${cat.slug}`}
-              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/60 hover:border-primary/30 hover:bg-accent text-sm font-medium transition-colors"
-            >
-              <div
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: cat.color }}
-              />
-              <span className="whitespace-nowrap">{cat.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* Main Content Area */}
       <section className="max-w-7xl mx-auto px-4 mt-6">
         <div className="flex gap-6">
@@ -328,16 +311,7 @@ export default function HomePage() {
                   </div>
                   <div className="rounded-xl border border-border/50 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 p-5">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {[
-                        { label: 'Latest Jobs', slug: 'latest-jobs', color: '#16a34a' },
-                        { label: 'Results', slug: 'results', color: '#dc2626' },
-                        { label: 'Admit Cards', slug: 'admit-cards', color: '#7c3aed' },
-                        { label: 'Admissions', slug: 'admissions', color: '#0891b2' },
-                        { label: 'Scholarships', slug: 'scholarships', color: '#db2777' },
-                        { label: 'Assam Govt Jobs', slug: 'assam-govt-jobs', color: '#0d9488' },
-                        { label: 'Defence Jobs', slug: 'defence-jobs', color: '#b45309' },
-                        { label: 'Bank Jobs', slug: 'bank-jobs', color: '#c026d3' },
-                      ].map((item) => (
+                      {quickCategories.map((item) => (
                         <Link
                           key={item.slug}
                           href={`/category/${item.slug}`}
@@ -348,7 +322,7 @@ export default function HomePage() {
                             style={{ backgroundColor: item.color }}
                           />
                           <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors line-clamp-1">
-                            {item.label}
+                            {item.name}
                           </span>
                         </Link>
                       ))}

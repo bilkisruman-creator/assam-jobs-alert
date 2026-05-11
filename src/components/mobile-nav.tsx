@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Briefcase, GraduationCap, Search } from 'lucide-react';
+import { Home, Briefcase, Search, Menu } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -10,11 +10,10 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {
-  ChevronDown, Landmark, Building2, Users,
-  Trophy, IdCard, BookOpen, FileCheck, BookMarked,
+  Trophy, IdCard, GraduationCap, BookOpen, FileCheck, BookMarked,
+  Landmark, Building2, Shield,
   Info, Mail, ShieldCheck, FileText, Megaphone,
   Scale, Globe, Download, MessageCircle, ExternalLink,
-  MapPin,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -24,36 +23,26 @@ interface Settings {
   android_app_link?: string;
 }
 
-const navItems = [
+const bottomNavItems = [
   { label: 'Home', href: '/', icon: Home },
   { label: 'Jobs', href: '/category/latest-jobs', icon: Briefcase },
   { label: 'Results', href: '/category/results', icon: Trophy },
   { label: 'Search', href: '/search', icon: Search },
 ];
 
-const categoryGroups = [
-  {
-    label: 'Jobs', color: '#16a34a',
-    items: [
-      { label: 'Latest Jobs', href: '/category/latest-jobs', icon: Briefcase },
-      { label: 'Assam Govt', href: '/category/assam-govt-jobs', icon: Landmark },
-      { label: 'State Govt Jobs', href: '/category/state-government-jobs', icon: MapPin },
-      { label: 'Central Govt', href: '/category/central-govt-jobs', icon: Building2 },
-      { label: 'Private Jobs', href: '/category/private-jobs', icon: Briefcase },
-      { label: 'Walk-in', href: '/category/walk-in-interviews', icon: Users },
-    ],
-  },
-  {
-    label: 'Education', color: '#0891b2',
-    items: [
-      { label: 'Results', href: '/category/results', icon: Trophy },
-      { label: 'Admit Cards', href: '/category/admit-cards', icon: IdCard },
-      { label: 'Admissions', href: '/category/admissions', icon: GraduationCap },
-      { label: 'Scholarships', href: '/category/scholarships', icon: BookOpen },
-      { label: 'Syllabus', href: '/category/syllabus', icon: BookMarked },
-      { label: 'Answer Key', href: '/category/answer-key', icon: FileCheck },
-    ],
-  },
+const categoryPills = [
+  { name: 'Latest Jobs', slug: 'latest-jobs', color: '#16a34a', icon: Briefcase },
+  { name: 'Results', slug: 'results', color: '#dc2626', icon: Trophy },
+  { name: 'Admit Cards', slug: 'admit-cards', color: '#7c3aed', icon: IdCard },
+  { name: 'Admissions', slug: 'admissions', color: '#0891b2', icon: GraduationCap },
+  { name: 'Scholarships', slug: 'scholarships', color: '#db2777', icon: BookOpen },
+  { name: 'Assam Govt', slug: 'assam-govt-jobs', color: '#0d9488', icon: Landmark },
+  { name: 'Central Govt', slug: 'central-govt-jobs', color: '#1d4ed8', icon: Building2 },
+  { name: 'Defence', slug: 'defence-jobs', color: '#b45309', icon: Shield },
+  { name: 'Bank Jobs', slug: 'bank-jobs', color: '#c026d3', icon: Landmark },
+  { name: 'Private Jobs', slug: 'private-jobs', color: '#be185d', icon: Briefcase },
+  { name: 'Syllabus', slug: 'syllabus', color: '#6d28d9', icon: BookMarked },
+  { name: 'Answer Key', slug: 'answer-key', color: '#059669', icon: FileCheck },
 ];
 
 const pageLinks = [
@@ -69,7 +58,6 @@ const pageLinks = [
 
 export function MobileNav() {
   const pathname = usePathname();
-  const [expandedGroup, setExpandedGroup] = useState<string | null>('Jobs');
   const [settings, setSettings] = useState<Settings>({});
 
   useEffect(() => {
@@ -88,7 +76,7 @@ export function MobileNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t lg:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-14">
-        {navItems.map((item) => {
+        {bottomNavItems.map((item) => {
           const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           return (
             <Link
@@ -108,99 +96,88 @@ export function MobileNav() {
         <Sheet>
           <SheetTrigger asChild>
             <button className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 min-w-[56px] text-muted-foreground">
-              <Briefcase className="h-5 w-5" />
+              <Menu className="h-5 w-5" />
               <span className="text-[10px] font-medium">More</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-auto rounded-t-xl max-h-[75vh] overflow-y-auto">
+          <SheetContent side="bottom" className="h-auto rounded-t-2xl max-h-[80vh] overflow-y-auto">
             <SheetTitle className="sr-only">More Categories</SheetTitle>
-            <div className="py-2">
-              {categoryGroups.map((group) => (
-                <div key={group.label} className="mb-2">
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold"
-                    onClick={() => setExpandedGroup(expandedGroup === group.label ? null : group.label)}
-                  >
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ backgroundColor: group.color + '15' }}>
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: group.color }} />
-                    </div>
-                    {group.label}
-                    <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${expandedGroup === group.label ? 'rotate-180' : ''}`} />
-                  </button>
-                  {expandedGroup === group.label && (
-                    <div className="grid grid-cols-3 gap-2 px-3 pb-2">
-                      {group.items.map((item) => {
-                        const ItemIcon = item.icon;
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex flex-col items-center gap-1.5 py-3 rounded-lg hover:bg-accent transition-colors ${
-                              pathname.startsWith(item.href) ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''
-                            }`}
-                          >
-                            <ItemIcon className="h-5 w-5" />
-                            <span className="text-xs font-medium">{item.label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              ))}
+            {/* Drag handle */}
+            <div className="flex justify-center pt-2 pb-1">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
+            </div>
 
-              {/* Pages Section */}
-              <div className="mt-2 pt-2 border-t">
-                <button
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold"
-                  onClick={() => setExpandedGroup(expandedGroup === 'Pages' ? null : 'Pages')}
-                >
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                    <Info className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
-                  </div>
-                  Pages
-                  <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${expandedGroup === 'Pages' ? 'rotate-180' : ''}`} />
-                </button>
-                {expandedGroup === 'Pages' && (
-                  <>
-                    <div className="grid grid-cols-4 gap-2 px-3 pb-2">
-                      {pageLinks.map((item) => {
-                        const ItemIcon = item.icon;
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex flex-col items-center gap-1.5 py-3 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
-                          >
-                            <ItemIcon className="h-5 w-5" />
-                            <span className="text-[10px] font-medium text-center leading-tight">{item.label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                    {/* External Links */}
-                    <div className="px-3 pb-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Connect</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {externalLinks.map((item) => {
-                          const ItemIcon = item.icon;
-                          return (
-                            <a
-                              key={item.label}
-                              href={item.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex flex-col items-center gap-1.5 py-3 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
-                            >
-                              <ItemIcon className="h-5 w-5" />
-                              <span className="text-[10px] font-medium text-center leading-tight">{item.label}</span>
-                            </a>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
+            {/* Category Pills Grid */}
+            <div className="px-4 pt-2 pb-3">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Browse Categories</p>
+              <div className="flex flex-wrap gap-2">
+                {categoryPills.map((cat) => {
+                  const isActive = pathname === `/category/${cat.slug}`;
+                  return (
+                    <Link
+                      key={cat.slug}
+                      href={`/category/${cat.slug}`}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+                        isActive
+                          ? 'text-white border-transparent shadow-sm'
+                          : 'bg-background border-border/60 text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-accent'
+                      }`}
+                      style={
+                        isActive
+                          ? { backgroundColor: cat.color, borderColor: cat.color, boxShadow: `0 1px 3px ${cat.color}30` }
+                          : undefined
+                      }
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full shrink-0 ${isActive ? 'bg-white/80' : ''}`}
+                        style={!isActive ? { backgroundColor: cat.color } : undefined}
+                      />
+                      {cat.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Pages */}
+            <div className="px-4 pt-2 pb-3 border-t">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Quick Links</p>
+              <div className="grid grid-cols-4 gap-2">
+                {pageLinks.map((item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex flex-col items-center gap-1.5 py-2.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                    >
+                      <ItemIcon className="h-4 w-4" />
+                      <span className="text-[10px] font-medium text-center leading-tight">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* External Links */}
+            <div className="px-4 pt-2 pb-4 border-t">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Connect With Us</p>
+              <div className="grid grid-cols-3 gap-2">
+                {externalLinks.map((item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-1.5 py-2.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                    >
+                      <ItemIcon className="h-4 w-4" />
+                      <span className="text-[10px] font-medium text-center leading-tight">{item.label}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           </SheetContent>
