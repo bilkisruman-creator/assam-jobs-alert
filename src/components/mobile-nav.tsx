@@ -12,7 +12,8 @@ import {
 import {
   ChevronDown, Landmark, Shield, Building2, Banknote, Users,
   Trophy, IdCard, BookOpen, FileCheck, BookMarked, Bell,
-  Calendar, TrendingUp,
+  Calendar, TrendingUp, Info, Mail, ShieldCheck, FileText,
+  Megaphone, Scale, Globe,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -56,6 +57,17 @@ const mobileGroups = [
   },
 ];
 
+const quickLinks = [
+  { label: 'About Us', href: '/page/about-us', icon: Info },
+  { label: 'Contact Us', href: '/page/contact-us', icon: Mail },
+  { label: 'Privacy Policy', href: '/page/privacy-policy', icon: ShieldCheck },
+  { label: 'Disclaimer', href: '/page/disclaimer', icon: FileText },
+  { label: 'Terms & Conditions', href: '/page/terms-and-conditions', icon: Scale },
+  { label: 'Advertise', href: '/page/advertise-with-us', icon: Megaphone },
+  { label: 'DMCA', href: '/page/dmca', icon: Shield },
+  { label: 'Sitemap', href: '/page/sitemap', icon: Globe },
+];
+
 export function MobileNav() {
   const pathname = usePathname();
   const [expandedGroup, setExpandedGroup] = useState<string | null>('Jobs');
@@ -87,7 +99,7 @@ export function MobileNav() {
               <span className="text-[10px] font-medium">More</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-auto rounded-t-xl max-h-[70vh] overflow-y-auto">
+          <SheetContent side="bottom" className="h-auto rounded-t-xl max-h-[75vh] overflow-y-auto">
             <SheetTitle className="sr-only">More Categories</SheetTitle>
             <div className="py-2">
               {mobileGroups.map((group) => (
@@ -123,6 +135,37 @@ export function MobileNav() {
                   )}
                 </div>
               ))}
+
+              {/* Quick Links Section */}
+              <div className="mt-2 pt-2 border-t">
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold"
+                  onClick={() => setExpandedGroup(expandedGroup === 'Quick Links' ? null : 'Quick Links')}
+                >
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                    <Info className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  Quick Links
+                  <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${expandedGroup === 'Quick Links' ? 'rotate-180' : ''}`} />
+                </button>
+                {expandedGroup === 'Quick Links' && (
+                  <div className="grid grid-cols-3 gap-2 px-3 pb-2">
+                    {quickLinks.map((item) => {
+                      const ItemIcon = item.icon;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="flex flex-col items-center gap-1.5 py-3 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
+                        >
+                          <ItemIcon className="h-5 w-5" />
+                          <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

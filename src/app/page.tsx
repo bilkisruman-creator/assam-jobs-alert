@@ -8,7 +8,17 @@ import { Sidebar } from '@/components/sidebar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Briefcase, TrendingUp, ChevronRight } from 'lucide-react';
+import {
+  ArrowRight,
+  Briefcase,
+  TrendingUp,
+  Trophy,
+  IdCard,
+  GraduationCap,
+  BookOpen,
+  Star,
+  Bell,
+} from 'lucide-react';
 
 interface Post {
   id: string;
@@ -21,17 +31,20 @@ interface Post {
   publishedAt: string | null;
   isBreaking: boolean;
   isTrending: boolean;
+  isFeatured: boolean;
   category: { name: string; slug: string; color: string | null };
   importantDates: { label: string; date: string }[];
 }
 
-interface CategoryWithCount {
-  id: string;
-  name: string;
+interface SectionConfig {
+  key: string;
+  title: string;
+  icon: React.ElementType;
+  iconBg: string;
+  iconColor: string;
   slug: string;
-  icon: string | null;
-  color: string | null;
-  postCount: number;
+  limit: number;
+  badge?: string;
 }
 
 function PostCardSkeleton() {
@@ -56,35 +69,136 @@ function PostCardSkeleton() {
   );
 }
 
+function SectionSkeleton() {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-8 rounded-lg" />
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <Skeleton className="h-8 w-20" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <PostCardSkeleton />
+        <PostCardSkeleton />
+      </div>
+    </div>
+  );
+}
+
 const quickCategories = [
-  { name: 'Latest Jobs', slug: 'latest-jobs', icon: 'Briefcase', color: '#16a34a' },
-  { name: 'Results', slug: 'results', icon: 'Trophy', color: '#dc2626' },
-  { name: 'Admit Cards', slug: 'admit-cards', icon: 'IdCard', color: '#7c3aed' },
-  { name: 'Admissions', slug: 'admissions', icon: 'GraduationCap', color: '#0891b2' },
-  { name: 'Scholarships', slug: 'scholarships', icon: 'BookOpen', color: '#db2777' },
-  { name: 'Assam Govt', slug: 'assam-govt-jobs', icon: 'Landmark', color: '#0d9488' },
-  { name: 'Central Govt', slug: 'central-govt-jobs', icon: 'Building2', color: '#1d4ed8' },
-  { name: 'Defence', slug: 'defence-jobs', icon: 'Shield', color: '#b45309' },
-  { name: 'Bank Jobs', slug: 'bank-jobs', icon: 'Banknote', color: '#c026d3' },
-  { name: 'Syllabus', slug: 'syllabus', icon: 'BookMarked', color: '#6d28d9' },
+  { name: 'Latest Jobs', slug: 'latest-jobs', color: '#16a34a' },
+  { name: 'Results', slug: 'results', color: '#dc2626' },
+  { name: 'Admit Cards', slug: 'admit-cards', color: '#7c3aed' },
+  { name: 'Admissions', slug: 'admissions', color: '#0891b2' },
+  { name: 'Scholarships', slug: 'scholarships', color: '#db2777' },
+  { name: 'Assam Govt', slug: 'assam-govt-jobs', color: '#0d9488' },
+  { name: 'Central Govt', slug: 'central-govt-jobs', color: '#1d4ed8' },
+  { name: 'Defence', slug: 'defence-jobs', color: '#b45309' },
+  { name: 'Bank Jobs', slug: 'bank-jobs', color: '#c026d3' },
+  { name: 'Syllabus', slug: 'syllabus', color: '#6d28d9' },
+];
+
+const sections: SectionConfig[] = [
+  {
+    key: 'latest-jobs',
+    title: 'Latest Jobs',
+    icon: Briefcase,
+    iconBg: 'bg-green-50 dark:bg-green-900/20',
+    iconColor: 'text-green-600',
+    slug: 'latest-jobs',
+    limit: 4,
+    badge: 'New',
+  },
+  {
+    key: 'results',
+    title: 'Results',
+    icon: Trophy,
+    iconBg: 'bg-red-50 dark:bg-red-900/20',
+    iconColor: 'text-red-600',
+    slug: 'results',
+    limit: 4,
+  },
+  {
+    key: 'admit-cards',
+    title: 'Admit Cards',
+    icon: IdCard,
+    iconBg: 'bg-violet-50 dark:bg-violet-900/20',
+    iconColor: 'text-violet-600',
+    slug: 'admit-cards',
+    limit: 4,
+  },
+  {
+    key: 'admissions',
+    title: 'Admissions',
+    icon: GraduationCap,
+    iconBg: 'bg-cyan-50 dark:bg-cyan-900/20',
+    iconColor: 'text-cyan-600',
+    slug: 'admissions',
+    limit: 4,
+  },
+  {
+    key: 'scholarships',
+    title: 'Scholarships',
+    icon: BookOpen,
+    iconBg: 'bg-pink-50 dark:bg-pink-900/20',
+    iconColor: 'text-pink-600',
+    slug: 'scholarships',
+    limit: 4,
+  },
 ];
 
 export default function HomePage() {
-  const [latestJobs, setLatestJobs] = useState<Post[]>([]);
+  const [sectionData, setSectionData] = useState<Record<string, Post[]>>({});
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
+  const [featuredPosts, setFeaturedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/posts?category=latest-jobs&limit=4').then((r) => r.json()),
-      fetch('/api/posts?trending=true&limit=6').then((r) => r.json()),
-    ])
-      .then(([jobsData, trendData]) => {
-        setLatestJobs(jobsData.posts || []);
-        setTrendingPosts(trendData.posts || []);
+    const fetchAllData = async () => {
+      try {
+        // Fetch all section data in parallel
+        const fetches = sections.map((section) =>
+          fetch(`/api/posts?category=${section.slug}&limit=${section.limit}`)
+            .then((r) => r.json())
+            .then((data) => ({ key: section.key, posts: data.posts || [] }))
+        );
+
+        // Also fetch trending and featured
+        fetches.push(
+          fetch('/api/posts?trending=true&limit=6')
+            .then((r) => r.json())
+            .then((data) => ({ key: '_trending', posts: data.posts || [] }))
+        );
+        fetches.push(
+          fetch('/api/posts?featured=true&limit=4')
+            .then((r) => r.json())
+            .then((data) => ({ key: '_featured', posts: data.posts || [] }))
+        );
+
+        const results = await Promise.all(fetches);
+        const dataMap: Record<string, Post[]> = {};
+
+        results.forEach((result) => {
+          if (result.key === '_trending') {
+            setTrendingPosts(result.posts);
+          } else if (result.key === '_featured') {
+            setFeaturedPosts(result.posts);
+          } else {
+            dataMap[result.key] = result.posts;
+          }
+        });
+
+        setSectionData(dataMap);
+      } catch (error) {
+        console.error('Error fetching homepage data:', error);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchAllData();
   }, []);
 
   return (
@@ -120,42 +234,68 @@ export default function HomePage() {
           <div className="flex-1 min-w-0">
             {loading ? (
               <div className="space-y-6">
-                <Skeleton className="h-8 w-48" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                </div>
+                <SectionSkeleton />
+                <SectionSkeleton />
+                <SectionSkeleton />
               </div>
             ) : (
               <>
-                {/* Latest Jobs Section */}
-                {latestJobs.length > 0 && (
+                {/* Featured Posts - Hero Banner Style */}
+                {featuredPosts.length > 0 && (
                   <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-50 dark:bg-green-900/20">
-                          <Briefcase className="h-4 w-4 text-green-600" />
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 dark:bg-amber-900/20">
+                          <Star className="h-4 w-4 text-amber-500" />
                         </div>
-                        <h2 className="text-lg md:text-xl font-bold">Latest Jobs</h2>
-                        <Badge variant="secondary" className="text-[10px]">
-                          {latestJobs.length} new
+                        <h2 className="text-lg md:text-xl font-bold">Featured</h2>
+                        <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                          Editor&apos;s Pick
                         </Badge>
                       </div>
-                      <Link href="/category/latest-jobs">
-                        <Button variant="ghost" size="sm" className="text-xs">
-                          View All <ArrowRight className="ml-1 h-3 w-3" />
-                        </Button>
-                      </Link>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {latestJobs.map((post) => (
+                      {featuredPosts.map((post) => (
                         <PostCard key={post.id} post={post} />
                       ))}
                     </div>
                   </div>
                 )}
+
+                {/* Dynamic Category Sections */}
+                {sections.map((section) => {
+                  const posts = sectionData[section.key] || [];
+                  if (posts.length === 0) return null;
+
+                  const SectionIcon = section.icon;
+                  return (
+                    <div key={section.key} className="mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${section.iconBg}`}>
+                            <SectionIcon className={`h-4 w-4 ${section.iconColor}`} />
+                          </div>
+                          <h2 className="text-lg md:text-xl font-bold">{section.title}</h2>
+                          {section.badge && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              {posts.length} new
+                            </Badge>
+                          )}
+                        </div>
+                        <Link href={`/category/${section.slug}`}>
+                          <Button variant="ghost" size="sm" className="text-xs">
+                            View All <ArrowRight className="ml-1 h-3 w-3" />
+                          </Button>
+                        </Link>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {posts.map((post) => (
+                          <PostCard key={post.id} post={post} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
 
                 {/* Trending Notifications */}
                 {trendingPosts.length > 0 && (
@@ -176,32 +316,43 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* Browse by Category - Compact Grid */}
+                {/* Important Updates */}
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg md:text-xl font-bold">Browse Categories</h2>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-900/20">
+                        <Bell className="h-4 w-4 text-blue-500" />
+                      </div>
+                      <h2 className="text-lg md:text-xl font-bold">Important Updates</h2>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    {quickCategories.map((cat) => (
-                      <Link
-                        key={cat.slug}
-                        href={`/category/${cat.slug}`}
-                        className="group flex items-center gap-2 p-3 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-md transition-all"
-                      >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: cat.color + '12' }}
+                  <div className="rounded-xl border border-border/50 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 p-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[
+                        { label: 'Latest Jobs', slug: 'latest-jobs', color: '#16a34a' },
+                        { label: 'Results', slug: 'results', color: '#dc2626' },
+                        { label: 'Admit Cards', slug: 'admit-cards', color: '#7c3aed' },
+                        { label: 'Admissions', slug: 'admissions', color: '#0891b2' },
+                        { label: 'Scholarships', slug: 'scholarships', color: '#db2777' },
+                        { label: 'Assam Govt Jobs', slug: 'assam-govt-jobs', color: '#0d9488' },
+                        { label: 'Defence Jobs', slug: 'defence-jobs', color: '#b45309' },
+                        { label: 'Bank Jobs', slug: 'bank-jobs', color: '#c026d3' },
+                      ].map((item) => (
+                        <Link
+                          key={item.slug}
+                          href={`/category/${item.slug}`}
+                          className="flex items-center gap-2 p-3 rounded-lg bg-background/80 hover:bg-background border border-border/30 hover:border-primary/20 transition-all group"
                         >
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium line-clamp-1 group-hover:text-primary transition-colors">
-                            {cat.name}
-                          </p>
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0 ml-auto group-hover:text-primary" />
-                      </Link>
-                    ))}
+                          <div
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors line-clamp-1">
+                            {item.label}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </>

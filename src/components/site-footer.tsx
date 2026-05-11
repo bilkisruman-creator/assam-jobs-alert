@@ -65,6 +65,17 @@ export function SiteFooter() {
     { name: 'Syllabus', slug: 'syllabus' },
   ];
 
+  const quickLinks = [
+    { name: 'About Us', href: '/page/about-us' },
+    { name: 'Contact Us', href: '/page/contact-us' },
+    { name: 'Privacy Policy', href: '/page/privacy-policy' },
+    { name: 'Disclaimer', href: '/page/disclaimer' },
+    { name: 'Terms & Conditions', href: '/page/terms-and-conditions' },
+    { name: 'Advertise With Us', href: '/page/advertise-with-us' },
+    { name: 'DMCA', href: '/page/dmca' },
+    { name: 'Sitemap', href: '/page/sitemap' },
+  ];
+
   const importantLinks = [
     { name: 'APSC Official', url: 'https://apsc.nic.in' },
     { name: 'SLPRB Assam', url: 'https://slprbassam.in' },
@@ -114,9 +125,9 @@ export function SiteFooter() {
 
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
           {/* About */}
-          <div>
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <Briefcase className="h-4.5 w-4.5 text-white" />
@@ -154,6 +165,23 @@ export function SiteFooter() {
                     className="text-sm text-gray-400 hover:text-green-400 transition-colors"
                   >
                     {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="font-semibold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-green-400 transition-colors"
+                  >
+                    {link.name}
                   </Link>
                 </li>
               ))}
@@ -207,9 +235,19 @@ export function SiteFooter() {
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} Assam Jobs Alert. All rights reserved.
           </p>
-          <p className="text-xs text-gray-500">
-            Made with ❤️ for the people of Assam
-          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {quickLinks.slice(0, 5).map((link, i) => (
+              <span key={link.href} className="flex items-center gap-4">
+                <Link
+                  href={link.href}
+                  className="text-xs text-gray-500 hover:text-green-400 transition-colors"
+                >
+                  {link.name}
+                </Link>
+                {i < 4 && <span className="text-gray-700">·</span>}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

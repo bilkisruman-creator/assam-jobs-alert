@@ -7,6 +7,8 @@ import {
   Briefcase, Award, IdCard, GraduationCap, BookOpen, FileCheck,
   BookMarked, Landmark, Shield, Building2, Bell, Banknote,
   Calendar, Trophy, Users, ChevronRight, MapPin, TrendingUp,
+  Info, Mail, ShieldCheck, FileText, Megaphone, Scale, Globe,
+  Download, MessageCircle,
 } from 'lucide-react';
 
 const menuGroups = [
@@ -48,11 +50,22 @@ const menuGroups = [
   },
 ];
 
+const quickLinks = [
+  { name: 'About Us', href: '/page/about-us', icon: Info, desc: 'Know more about us' },
+  { name: 'Contact Us', href: '/page/contact-us', icon: Mail, desc: 'Get in touch' },
+  { name: 'Privacy Policy', href: '/page/privacy-policy', icon: ShieldCheck, desc: 'How we handle your data' },
+  { name: 'Disclaimer', href: '/page/disclaimer', icon: FileText, desc: 'Important disclaimers' },
+  { name: 'Terms & Conditions', href: '/page/terms-and-conditions', icon: Scale, desc: 'Terms of service' },
+  { name: 'Advertise With Us', href: '/page/advertise-with-us', icon: Megaphone, desc: 'Advertising options' },
+  { name: 'DMCA', href: '/page/dmca', icon: Shield, desc: 'Copyright policy' },
+  { name: 'Sitemap', href: '/page/sitemap', icon: Globe, desc: 'Browse all pages' },
+];
+
 export function MegaMenu() {
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center">
       {menuGroups.map((group) => {
         const GroupIcon = group.icon;
         return (
@@ -119,6 +132,58 @@ export function MegaMenu() {
           </div>
         );
       })}
+
+      {/* Quick Links dropdown */}
+      <div
+        className="relative inline-block"
+        onMouseEnter={() => setActiveGroup('quick-links')}
+        onMouseLeave={() => setActiveGroup(null)}
+      >
+        <button className="px-3 py-2 text-sm font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-accent flex items-center gap-1">
+          <Info className="h-3.5 w-3.5" />
+          Quick Links
+        </button>
+
+        {activeGroup === 'quick-links' && (
+          <div className="absolute top-full right-0 z-50 pt-1">
+            <div className="bg-popover border rounded-xl shadow-xl w-[420px] p-4 animate-in fade-in-0 zoom-in-95 duration-100">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                  <Info className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                </div>
+                <span className="font-semibold text-sm">Quick Links</span>
+                <Badge variant="secondary" className="text-[10px] ml-auto">
+                  {quickLinks.length} pages
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {quickLinks.map((item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-accent transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-gray-50 dark:bg-gray-800">
+                        <ItemIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-1">
+                          {item.name}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
