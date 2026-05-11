@@ -176,3 +176,41 @@ Stage Summary:
 - Added Defence and Bank Jobs categories to menu and database
 - Homepage cleaned up (removed duplicate category pills section)
 - No changes to admin panel, automation system, or backend structure
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Update admin panel - Change Breaking→New, add badge animations, add featured image upload
+
+Work Log:
+- Changed "Breaking" label to "New" across all display components:
+  - breaking-ticker.tsx: "BREAKING" → "NEW" with Sparkles icon (pulse animation)
+  - post-card.tsx: Badge text "Breaking" → "✨ New" with badge-new CSS class
+  - post/[slug]/page.tsx: Badge text "Breaking" → "✨ New" with badge-new CSS class
+  - admin/post-form.tsx: Switch label "Breaking" → "Mark as New"
+- Added CSS animations in globals.css:
+  - .badge-new: Pulse glow (box-shadow) + bounce (scale) animation
+  - .badge-featured: Shine sweep (background-position) + glow animation
+  - .badge-trending: Slide pulse (translateX + scale) + glow animation
+- Updated badge text: Trending → "📈 Trending", Featured "⭐ Editor's Pick"
+- Applied badge-featured to Featured section badge on homepage
+- Created image upload API: /api/admin/upload/route.ts
+  - Validates file type (JPG, PNG, WEBP, SVG)
+  - Validates file size (max 5MB)
+  - Requires admin authentication
+  - Saves to public/uploads/ with unique filename
+- Updated admin post form with drag-and-drop image upload:
+  - Upload/URL toggle tabs
+  - Drag-and-drop zone with visual feedback
+  - Click to upload with file picker
+  - Image preview with Replace/Remove buttons on hover
+  - Upload progress spinner overlay
+  - URL input mode still available as secondary option
+- Lint passes, all routes return 200
+
+Stage Summary:
+- "Breaking" renamed to "New" across all public-facing components
+- Three animated badge styles: New (pulse+glow+bounce), Featured (shine+glow), Trending (slide+glow)
+- Featured image upload system with drag-and-drop, file picker, and preview
+- Upload API with validation and auth protection
+- No changes to website layout, homepage design, navigation, automation, SEO, or backend structure

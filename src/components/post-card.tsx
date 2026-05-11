@@ -67,13 +67,13 @@ export function PostCard({ post }: PostCardProps) {
               {post.category.name}
             </Badge>
             {post.isBreaking && (
-              <Badge variant="destructive" className="text-xs">
-                Breaking
+              <Badge variant="destructive" className="text-xs badge-new">
+                ✨ New
               </Badge>
             )}
             {post.isTrending && (
-              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                Trending
+              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 badge-trending">
+                📈 Trending
               </Badge>
             )}
           </div>

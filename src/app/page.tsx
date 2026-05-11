@@ -232,8 +232,8 @@ export default function HomePage() {
                           <Star className="h-4 w-4 text-amber-500" />
                         </div>
                         <h2 className="text-lg md:text-xl font-bold">Featured</h2>
-                        <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                          Editor&apos;s Pick
+                        <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 badge-featured">
+                          ⭐ Editor&apos;s Pick
                         </Badge>
                       </div>
                     </div>

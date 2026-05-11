@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, Eye, X, Plus, GripVertical, Trash2 } from 'lucide-react'
+import { Save, Eye, X, Plus, GripVertical, Trash2, Upload, ImageIcon, Link } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -79,6 +79,9 @@ export function PostForm({ postId, initialData }: PostFormProps) {
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '')
   const [content, setContent] = useState(initialData?.content || '')
   const [featuredImage, setFeaturedImage] = useState(initialData?.featuredImage || '')
+  const [uploading, setUploading] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload')
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || '')
   const [templateType, setTemplateType] = useState(initialData?.templateType || 'job')
   const [status, setStatus] = useState(initialData?.status || 'draft')
@@ -125,6 +128,43 @@ export function PostForm({ postId, initialData }: PostFormProps) {
       }
     }
   }, [])
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
+    if (!allowed.includes(file.type)) {
+      toast.error('Invalid file type. Only JPG, PNG, WEBP, SVG are allowed.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 5MB.')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setFeaturedImage(data.url)
+        toast.success('Image uploaded successfully')
+      } else {
+        toast.error(data.error || 'Failed to upload image')
+      }
+    } catch {
+      toast.error('Failed to upload image')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const addSection = () => {
     setSections([...sections, { id: Date.now().toString(), title: '', content: '' }])
@@ -308,16 +348,122 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
             {/* Featured Image */}
             <div className="space-y-2">
-              <Label htmlFor="featuredImage" className="text-sm font-semibold">Featured Image URL</Label>
-              <Input
-                id="featuredImage"
-                placeholder="https://example.com/image.jpg"
-                value={featuredImage}
-                onChange={(e) => setFeaturedImage(e.target.value)}
-              />
-              {featuredImage && (
-                <div className="mt-2 relative w-full max-w-sm h-40 rounded-lg overflow-hidden border bg-muted">
-                  <img src={featuredImage} alt="Featured image preview" className="w-full h-full object-cover" />
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">Featured Image</Label>
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setImageInputMode('upload')}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                      imageInputMode === 'upload' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Upload className="h-3 w-3" />
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageInputMode('url')}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                      imageInputMode === 'url' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Link className="h-3 w-3" />
+                    URL
+                  </button>
+                </div>
+              </div>
+
+              {imageInputMode === 'upload' ? (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setDragOver(false)
+                    const file = e.dataTransfer.files[0]
+                    if (file) handleImageUpload(file)
+                  }}
+                  className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
+                    dragOver
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/20 scale-[1.01]'
+                      : 'border-border/60 bg-muted/20 hover:border-border hover:bg-muted/30'
+                  }`}
+                >
+                  {featuredImage ? (
+                    <div className="relative group">
+                      <div className="w-full h-48 rounded-xl overflow-hidden">
+                        <img src={featuredImage} alt="Featured image preview" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) handleImageUpload(file)
+                            }}
+                          />
+                          <span className="bg-white text-black px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                            Replace Image
+                          </span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setFeaturedImage('')}
+                          className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center py-8 px-4 cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) handleImageUpload(file)
+                        }}
+                      />
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors ${
+                        dragOver ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'
+                      }`}>
+                        <ImageIcon className={`h-6 w-6 ${dragOver ? 'text-green-600' : 'text-muted-foreground'}`} />
+                      </div>
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        JPG, PNG, WEBP, SVG (max 5MB)
+                      </p>
+                    </label>
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-sm font-medium">Uploading...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="https://example.com/image.jpg"
+                    value={featuredImage}
+                    onChange={(e) => setFeaturedImage(e.target.value)}
+                  />
+                  {featuredImage && (
+                    <div className="relative w-full max-w-sm h-40 rounded-lg overflow-hidden border bg-muted">
+                      <img src={featuredImage} alt="Featured image preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -488,7 +634,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
               <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="breaking" className="text-sm">Breaking</Label>
+              <Label htmlFor="breaking" className="text-sm">Mark as New</Label>
               <Switch id="breaking" checked={isBreaking} onCheckedChange={setIsBreaking} />
             </div>
             <div className="flex items-center justify-between">
