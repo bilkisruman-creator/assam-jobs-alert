@@ -14,6 +14,7 @@ import {
   Trophy, IdCard, BookOpen, FileCheck, BookMarked,
   Info, Mail, ShieldCheck, FileText, Megaphone,
   Scale, Globe, Download, MessageCircle, ExternalLink,
+  MapPin,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -36,6 +37,7 @@ const categoryGroups = [
     items: [
       { label: 'Latest Jobs', href: '/category/latest-jobs', icon: Briefcase },
       { label: 'Assam Govt', href: '/category/assam-govt-jobs', icon: Landmark },
+      { label: 'State Govt Jobs', href: '/category/state-government-jobs', icon: MapPin },
       { label: 'Central Govt', href: '/category/central-govt-jobs', icon: Building2 },
       { label: 'Private Jobs', href: '/category/private-jobs', icon: Briefcase },
       { label: 'Walk-in', href: '/category/walk-in-interviews', icon: Users },

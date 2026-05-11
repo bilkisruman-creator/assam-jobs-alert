@@ -39,6 +39,7 @@ async function main() {
     { name: 'Central Govt Jobs', slug: 'central-govt-jobs', icon: 'Building2', color: '#1d4ed8', order: 12, description: 'Central government job notifications' },
     { name: 'Private Jobs', slug: 'private-jobs', icon: 'Building', color: '#be185d', order: 13, description: 'Private sector job opportunities in Assam' },
     { name: 'Walk-in Interviews', slug: 'walk-in-interviews', icon: 'Users', color: '#65a30d', order: 14, description: 'Walk-in interview schedules and details' },
+    { name: 'State Government Jobs', slug: 'state-government-jobs', icon: 'MapPin', color: '#0d9488', order: 15, description: 'All state government job notifications across India' },
   ];
 
   const createdCategories = [];

@@ -57,11 +57,14 @@ export function SiteFooter() {
 
   const categories = [
     { name: 'Latest Jobs', slug: 'latest-jobs' },
+    { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs' },
+    { name: 'State Govt Jobs', slug: 'state-government-jobs' },
+    { name: 'Central Govt Jobs', slug: 'central-govt-jobs' },
     { name: 'Results', slug: 'results' },
     { name: 'Admit Cards', slug: 'admit-cards' },
     { name: 'Admissions', slug: 'admissions' },
     { name: 'Scholarships', slug: 'scholarships' },
-    { name: 'Answer Keys', slug: 'answer-keys' },
+    { name: 'Answer Key', slug: 'answer-key' },
     { name: 'Syllabus', slug: 'syllabus' },
   ];
 

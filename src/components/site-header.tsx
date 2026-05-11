@@ -38,6 +38,7 @@ import {
   Download,
   MessageCircle,
   ExternalLink,
+  MapPin,
 } from 'lucide-react';
 
 interface Settings {
@@ -54,6 +55,7 @@ const categoryGroups = [
     items: [
       { name: 'Latest Jobs', slug: 'latest-jobs', icon: Briefcase },
       { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs', icon: Landmark },
+      { name: 'State Government Jobs', slug: 'state-government-jobs', icon: MapPin },
       { name: 'Central Govt Jobs', slug: 'central-govt-jobs', icon: Building2 },
       { name: 'Private Jobs', slug: 'private-jobs', icon: Briefcase },
       { name: 'Walk-in Interviews', slug: 'walk-in-interviews', icon: Users },

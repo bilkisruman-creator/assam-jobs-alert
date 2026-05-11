@@ -124,3 +124,23 @@ Stage Summary:
 - All specified pages appear under Pages group
 - External links (App Download, Telegram, WhatsApp Channel) appear under "Connect With Us" subsection
 - No changes to homepage, admin panel, automation system, design layout, or backend structure
+
+---
+Task ID: 8
+Agent: Main Agent
+Task: Add "State Government Jobs" category to main navigation menu
+
+Work Log:
+- Reviewed all 10 required categories from user's request: Assam Govt Jobs, State Government Jobs, Central Govt Jobs, Private Jobs, Results, Admit Cards, Admissions, Scholarships, Syllabus, Answer Key
+- Found that 9 of 10 were already in menus; only "State Government Jobs" was missing
+- Added MapPin icon import to mega-menu.tsx, site-header.tsx, mobile-nav.tsx
+- Added "State Government Jobs" (slug: state-government-jobs) to Jobs group in all 3 navigation components
+- Added "State Government Jobs" category to prisma/seed.ts and ran db:seed (15 categories now in DB)
+- Updated site-footer.tsx categories list to include Assam Govt Jobs, State Govt Jobs, Central Govt Jobs, Answer Key (was previously missing some)
+- Verified lint passes, all routes return 200, no runtime errors
+
+Stage Summary:
+- "State Government Jobs" now appears in desktop mega menu, mobile header menu, and bottom mobile nav
+- Category page at /category/state-government-jobs returns 200
+- Footer categories updated to match main menu categories
+- No changes to admin panel, automation system, design layout, or backend structure

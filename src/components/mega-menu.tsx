@@ -7,7 +7,7 @@ import {
   Briefcase, IdCard, GraduationCap, BookOpen, FileCheck,
   BookMarked, Landmark, Building2, Users, ChevronRight,
   Trophy, Info, Mail, ShieldCheck, FileText, Megaphone,
-  Scale, Download, MessageCircle, Globe,
+  Scale, Download, MessageCircle, Globe, MapPin,
 } from 'lucide-react';
 
 interface Settings {
@@ -23,7 +23,8 @@ const categoryGroups = [
     color: '#16a34a',
     items: [
       { name: 'Latest Jobs', slug: 'latest-jobs', icon: Briefcase, desc: 'All new job notifications' },
-      { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs', icon: Landmark, desc: 'State government jobs' },
+      { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs', icon: Landmark, desc: 'Assam state government jobs' },
+      { name: 'State Government Jobs', slug: 'state-government-jobs', icon: MapPin, desc: 'All state government jobs' },
       { name: 'Central Govt Jobs', slug: 'central-govt-jobs', icon: Building2, desc: 'Central government jobs' },
       { name: 'Private Jobs', slug: 'private-jobs', icon: Briefcase, desc: 'Private sector jobs' },
       { name: 'Walk-in Interviews', slug: 'walk-in-interviews', icon: Users, desc: 'Walk-in interview updates' },
