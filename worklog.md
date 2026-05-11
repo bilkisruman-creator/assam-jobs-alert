@@ -214,3 +214,37 @@ Stage Summary:
 - Featured image upload system with drag-and-drop, file picker, and preview
 - Upload API with validation and auth protection
 - No changes to website layout, homepage design, navigation, automation, SEO, or backend structure
+
+---
+Task ID: 11
+Agent: Main Agent
+Task: Add Logo Upload option inside Admin Panel → Appearance/Theme Settings
+
+Work Log:
+- Read and analyzed existing admin panel structure, settings page, header components, and API routes
+- Found existing Appearance tab with text-only logo_url input (no file upload)
+- Found existing upload API at /api/admin/upload supporting JPG, PNG, WEBP, SVG
+- Found public settings API at /api/settings with whitelist that didn't include logo_url/favicon_url
+- Updated /api/settings/route.ts to add logo_url and favicon_url to PUBLIC_SETTINGS_KEYS whitelist
+- Added ICO MIME type support to /api/admin/upload/route.ts for favicon uploads
+- Completely redesigned admin/settings/page.tsx Appearance tab with:
+  - Logo Upload Card with drag-and-drop + click-to-browse file upload
+  - Live logo preview with remove button (X icon on top-right of preview)
+  - Separate Favicon Upload Card with same upload UX
+  - Theme Colors card (preserved existing color pickers)
+  - File validation (type + size), loading states with spinner, toast notifications
+- Updated site-header.tsx:
+  - Added logo_url to Settings interface
+  - Desktop header: shows uploaded logo image if set, falls back to icon+text default
+  - Mobile Sheet menu header: shows uploaded logo (inverted for dark bg) if set, falls back to icon
+- Updated mobile-nav.tsx:
+  - Added logo_url to Settings interface for consistency
+- Verified all pages compile (200 status), lint passes cleanly, no dev server errors
+
+Stage Summary:
+- Logo Upload fully functional in Admin Panel → Settings → Appearance tab
+- Supports PNG, JPG, SVG, WEBP for logos (ICO also for favicon)
+- Live preview with remove capability in admin
+- Auto-updates desktop header + mobile menu header when logo is set and saved
+- Favicon is kept as a completely separate upload option
+- No other website features were modified

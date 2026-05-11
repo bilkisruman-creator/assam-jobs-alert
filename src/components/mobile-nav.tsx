@@ -21,6 +21,7 @@ interface Settings {
   telegram_link?: string;
   whatsapp_link?: string;
   android_app_link?: string;
+  logo_url?: string;
 }
 
 const bottomNavItems = [

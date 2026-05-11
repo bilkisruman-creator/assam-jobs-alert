@@ -8,6 +8,8 @@ const PUBLIC_SETTINGS_KEYS = [
   'site_description',
   'site_logo',
   'site_favicon',
+  'logo_url',
+  'favicon_url',
   'social_facebook',
   'social_twitter',
   'social_instagram',

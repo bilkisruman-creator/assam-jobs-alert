@@ -44,6 +44,7 @@ interface Settings {
   telegram_link?: string;
   whatsapp_link?: string;
   android_app_link?: string;
+  logo_url?: string;
 }
 
 const categoryPills = [
@@ -116,17 +117,27 @@ export function SiteHeader() {
             <div className="flex items-center justify-between h-13 md:h-14">
               {/* Logo */}
               <Link href="/" className="flex items-center gap-2 shrink-0">
-                <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center shadow-sm">
-                  <Briefcase className="h-4 w-4 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm md:text-base leading-tight text-green-700 dark:text-green-500">
-                    Assam Jobs Alert
-                  </span>
-                  <span className="text-[9px] text-muted-foreground leading-tight hidden sm:block">
-                    Govt Jobs & Education Portal
-                  </span>
-                </div>
+                {settings.logo_url ? (
+                  <img
+                    src={settings.logo_url}
+                    alt="Assam Jobs Alert"
+                    className="h-8 md:h-9 w-auto object-contain"
+                  />
+                ) : (
+                  <>
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center shadow-sm">
+                      <Briefcase className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm md:text-base leading-tight text-green-700 dark:text-green-500">
+                        Assam Jobs Alert
+                      </span>
+                      <span className="text-[9px] text-muted-foreground leading-tight hidden sm:block">
+                        Govt Jobs & Education Portal
+                      </span>
+                    </div>
+                  </>
+                )}
               </Link>
 
               {/* Actions */}
@@ -156,9 +167,17 @@ export function SiteHeader() {
                       {/* Mobile header */}
                       <div className="p-4 border-b bg-gradient-to-r from-green-600 to-green-700 text-white">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                            <Briefcase className="h-4 w-4" />
-                          </div>
+                          {settings.logo_url ? (
+                            <img
+                              src={settings.logo_url}
+                              alt="Assam Jobs Alert"
+                              className="h-8 w-auto object-contain brightness-0 invert"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                              <Briefcase className="h-4 w-4" />
+                            </div>
+                          )}
                           <div>
                             <p className="font-bold text-sm">Assam Jobs Alert</p>
                             <p className="text-[10px] text-green-100">Quick Links & More</p>

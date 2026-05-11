@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Save, Settings, Globe, Palette, Code, Smartphone, Share2 } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Save, Settings, Globe, Palette, Code, Smartphone, Share2, Upload, Image as ImageIcon, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +16,11 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingFavicon, setUploadingFavicon] = useState(false)
+  const [dragOver, setDragOver] = useState<'logo' | 'favicon' | null>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const faviconInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -51,6 +56,76 @@ export default function AdminSettingsPage() {
       setSaving(false)
     }
   }
+
+  const handleFileUpload = useCallback(async (
+    file: File,
+    type: 'logo' | 'favicon'
+  ) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
+    const maxSizes: Record<string, number> = { logo: 5 * 1024 * 1024, favicon: 2 * 1024 * 1024 }
+    const maxSize = maxSizes[type]
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Only PNG, JPG, SVG, and WEBP are allowed.')
+      return
+    }
+
+    if (file.size > maxSize) {
+      toast.error(`File too large. Maximum size is ${type === 'logo' ? '5MB' : '2MB'}.`)
+      return
+    }
+
+    if (type === 'logo') setUploadingLogo(true)
+    else setUploadingFavicon(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const settingKey = type === 'logo' ? 'logo_url' : 'favicon_url'
+        updateSetting(settingKey, data.url)
+        toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} uploaded successfully! Save settings to apply.`)
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Upload failed')
+      }
+    } catch {
+      toast.error('Upload failed. Please try again.')
+    } finally {
+      if (type === 'logo') setUploadingLogo(false)
+      else setUploadingFavicon(false)
+    }
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent, type: 'logo' | 'favicon') => {
+    e.preventDefault()
+    setDragOver(null)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFileUpload(file, type)
+  }, [handleFileUpload])
+
+  const handleDragOver = useCallback((e: React.DragEvent, type: 'logo' | 'favicon') => {
+    e.preventDefault()
+    setDragOver(type)
+  }, [])
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(null)
+  }, [])
+
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'favicon') => {
+    const file = e.target.files?.[0]
+    if (file) handleFileUpload(file, type)
+    // Reset input so the same file can be re-selected
+    e.target.value = ''
+  }, [handleFileUpload])
 
   if (loading) {
     return (
@@ -274,62 +349,230 @@ export default function AdminSettingsPage() {
 
         {/* Appearance */}
         <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Appearance Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Primary Color</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="color"
-                    value={settings.primary_color || '#16a34a'}
-                    onChange={(e) => updateSetting('primary_color', e.target.value)}
-                    className="w-12 h-9 p-1 cursor-pointer"
+          <div className="space-y-6">
+            {/* Logo Upload Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  Website Logo
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Upload your website logo. This will appear in the desktop and mobile header. Supports PNG, JPG, SVG, and WEBP.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Logo Preview */}
+                {settings.logo_url ? (
+                  <div className="space-y-3">
+                    <Label>Current Logo</Label>
+                    <div className="relative inline-block">
+                      <div className="border rounded-xl p-4 bg-muted/30 max-w-xs">
+                        <img
+                          src={settings.logo_url}
+                          alt="Website Logo"
+                          className="max-h-20 max-w-full object-contain"
+                        />
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => {
+                          updateSetting('logo_url', '')
+                          toast.success('Logo removed. Save settings to apply.')
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Path: {settings.logo_url}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-lg border border-dashed border-border bg-muted/20">
+                    <p className="text-sm text-muted-foreground">No logo uploaded yet. The default text logo will be displayed.</p>
+                  </div>
+                )}
+
+                <Separator />
+
+                {/* Upload Area */}
+                <div
+                  className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer ${
+                    dragOver === 'logo'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/20 scale-[1.01]'
+                      : 'border-border hover:border-green-400 hover:bg-muted/30'
+                  }`}
+                  onDragOver={(e) => handleDragOver(e, 'logo')}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'logo')}
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.svg,.webp"
+                    className="hidden"
+                    onChange={(e) => handleFileInput(e, 'logo')}
                   />
-                  <Input
-                    value={settings.primary_color || '#16a34a'}
-                    onChange={(e) => updateSetting('primary_color', e.target.value)}
-                    className="font-mono text-sm"
-                  />
+                  {uploadingLogo ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 text-green-600 animate-spin" />
+                      <p className="text-sm text-muted-foreground">Uploading logo...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <Upload className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {settings.logo_url ? 'Replace Logo' : 'Upload Logo'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Drag & drop or click to browse. PNG, JPG, SVG, WEBP (max 5MB)
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Accent Color</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="color"
-                    value={settings.accent_color || '#ea580c'}
-                    onChange={(e) => updateSetting('accent_color', e.target.value)}
-                    className="w-12 h-9 p-1 cursor-pointer"
+              </CardContent>
+            </Card>
+
+            {/* Favicon Upload Card - Separate */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  Favicon
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Upload a favicon for browser tabs. Recommended: 32×32 or 64×64 ICO, PNG, or SVG.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Favicon Preview */}
+                {settings.favicon_url ? (
+                  <div className="space-y-3">
+                    <Label>Current Favicon</Label>
+                    <div className="relative inline-block">
+                      <div className="border rounded-xl p-4 bg-muted/30">
+                        <img
+                          src={settings.favicon_url}
+                          alt="Favicon"
+                          className="h-8 w-8 object-contain"
+                        />
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => {
+                          updateSetting('favicon_url', '')
+                          toast.success('Favicon removed. Save settings to apply.')
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Path: {settings.favicon_url}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-lg border border-dashed border-border bg-muted/20">
+                    <p className="text-sm text-muted-foreground">No favicon uploaded. The default favicon will be used.</p>
+                  </div>
+                )}
+
+                <Separator />
+
+                {/* Favicon Upload Area */}
+                <div
+                  className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer ${
+                    dragOver === 'favicon'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/20 scale-[1.01]'
+                      : 'border-border hover:border-green-400 hover:bg-muted/30'
+                  }`}
+                  onDragOver={(e) => handleDragOver(e, 'favicon')}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'favicon')}
+                  onClick={() => faviconInputRef.current?.click()}
+                >
+                  <input
+                    ref={faviconInputRef}
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.svg,.webp,.ico"
+                    className="hidden"
+                    onChange={(e) => handleFileInput(e, 'favicon')}
                   />
-                  <Input
-                    value={settings.accent_color || '#ea580c'}
-                    onChange={(e) => updateSetting('accent_color', e.target.value)}
-                    className="font-mono text-sm"
-                  />
+                  {uploadingFavicon ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 text-green-600 animate-spin" />
+                      <p className="text-sm text-muted-foreground">Uploading favicon...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <Upload className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {settings.favicon_url ? 'Replace Favicon' : 'Upload Favicon'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Drag & drop or click to browse. PNG, ICO, SVG (max 2MB)
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <Label>Logo URL</Label>
-                <Input
-                  value={settings.logo_url || ''}
-                  onChange={(e) => updateSetting('logo_url', e.target.value)}
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Favicon URL</Label>
-                <Input
-                  value={settings.favicon_url || ''}
-                  onChange={(e) => updateSetting('favicon_url', e.target.value)}
-                  placeholder="https://example.com/favicon.ico"
-                />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Colors Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Theme Colors</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Primary Color</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="color"
+                      value={settings.primary_color || '#16a34a'}
+                      onChange={(e) => updateSetting('primary_color', e.target.value)}
+                      className="w-12 h-9 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.primary_color || '#16a34a'}
+                      onChange={(e) => updateSetting('primary_color', e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Accent Color</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="color"
+                      value={settings.accent_color || '#ea580c'}
+                      onChange={(e) => updateSetting('accent_color', e.target.value)}
+                      className="w-12 h-9 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={settings.accent_color || '#ea580c'}
+                      onChange={(e) => updateSetting('accent_color', e.target.value)}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Advanced */}
