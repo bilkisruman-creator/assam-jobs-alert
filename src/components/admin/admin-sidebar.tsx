@@ -12,6 +12,9 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Activity,
+  Bell,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -20,8 +23,10 @@ import { useAdminAuth } from '@/hooks/use-admin-auth'
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/posts', label: 'Posts', icon: FileText },
+  { href: '/admin/pending', label: 'Pending Approval', icon: Clock },
   { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
   { href: '/admin/sources', label: 'Sources', icon: Globe },
+  { href: '/admin/analytics', label: 'Analytics', icon: Activity },
   { href: '/admin/ads', label: 'Ads', icon: Megaphone },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]

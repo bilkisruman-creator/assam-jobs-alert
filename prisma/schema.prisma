@@ -66,12 +66,18 @@ model Post {
   readTime       Int           @default(0)
   publishedAt    DateTime?
   expiredAt      DateTime?
+  sourceId       String?
+  sourceType     String?       @default("manual")
+  aiProcessed    Boolean       @default(false)
+  spamScore      Float         @default(0)
+  qualityScore   Float         @default(0)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   category       Category      @relation(fields: [categoryId], references: [id])
   tags           PostTag[]
   importantDates ImportantDate[]
   importantLinks ImportantLink[]
+  source         Source?       @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 }
 
 model PostTag {
@@ -104,22 +110,38 @@ model ImportantLink {
 }
 
 model Source {
-  id            String    @id @default(cuid())
-  name          String
-  url           String
-  sourceType    String    @default("rss")
-  categoryId    String
-  isActive      Boolean   @default(true)
-  fetchInterval Int       @default(60)
-  selectors     String?
-  mappingRules  String?
-  autoPublish   Boolean   @default(false)
-  lastFetchedAt DateTime?
-  lastStatus    String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  category      Category  @relation(fields: [categoryId], references: [id])
-  fetchLogs     FetchLog[]
+  id              String    @id @default(cuid())
+  name            String
+  url             String
+  sourceType      String    @default("rss")
+  categoryId      String
+  isActive        Boolean   @default(true)
+  priority        Int       @default(5)
+  fetchInterval   Int       @default(300)
+  selectors       String?
+  mappingRules    String?
+  autoPublish     Boolean   @default(false)
+  proxyUrl        String?
+  apiToken        String?
+  apiHeaders      String?
+  cssSelector     String?
+  xpathSelector   String?
+  rssUrl          String?
+  lastFetchedAt   DateTime?
+  lastStatus      String?
+  lastError       String?
+  healthScore     Float     @default(100)
+  totalFetched    Int       @default(0)
+  totalFailed     Int       @default(0)
+  consecutiveFail Int       @default(0)
+  qualityScore    Float     @default(50)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  category        Category     @relation(fields: [categoryId], references: [id])
+  fetchLogs       FetchLog[]
+  posts           Post[]
+  fetchedPosts    FetchedPost[]
+  fetchQueue      FetchQueue[]
 }
 
 model FetchLog {
@@ -128,9 +150,58 @@ model FetchLog {
   status       String
   itemsFound   Int      @default(0)
   itemsCreated Int      @default(0)
+  itemsPending Int      @default(0)
   error        String?
+  fetchDuration Int     @default(0)
   createdAt    DateTime @default(now())
   source       Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+model FetchedPost {
+  id              String   @id @default(cuid())
+  sourceId        String
+  sourceName      String
+  sourceUrl       String
+  originalTitle   String
+  originalContent String?
+  processedTitle  String?
+  processedContent String?
+  originalUrl     String?
+  originalImage   String?
+  categoryId      String?
+  templateType    String   @default("job")
+  status          String   @default("pending")
+  spamScore       Float    @default(0)
+  qualityScore    Float    @default(0)
+  isDuplicate     Boolean  @default(false)
+  duplicateOfId   String?
+  aiTags          String?
+  aiCategory      String?
+  seoTitle        String?
+  seoDescription  String?
+  importantDates  String?
+  importantLinks  String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  publishedPostId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  source          Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+model FetchQueue {
+  id          String   @id @default(cuid())
+  sourceId    String
+  priority    Int      @default(5)
+  status      String   @default("queued")
+  retryCount  Int      @default(0)
+  maxRetries  Int      @default(3)
+  error       String?
+  scheduledAt DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  source      Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 }
 
 model Setting {
@@ -178,4 +249,48 @@ model Page {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventType  String
+  pagePath   String?
+  postId     String?
+  referrer   String?
+  country    String?
+  city       String?
+  device     String?
+  browser    String?
+  os         String?
+  ipAddress  String?
+  userAgent  String?
+  sessionId  String?
+  duration   Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model DailyAnalytics {
+  id           String   @id @default(cuid())
+  date         String   @unique
+  totalViews   Int      @default(0)
+  uniqueVisits Int      @default(0)
+  newUsers     Int      @default(0)
+  bounceRate   Float    @default(0)
+  avgDuration  Float    @default(0)
+  topCountry   String?
+  topDevice    String?
+  topBrowser   String?
+  topReferrer  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
 }

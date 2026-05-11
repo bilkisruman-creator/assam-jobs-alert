@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BreakingTicker } from "@/components/breaking-ticker";
 import { MobileNav } from "@/components/mobile-nav";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -79,6 +80,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <SiteFooter />
             <MobileNav />
+            <AnalyticsTracker />
           </div>
           <Toaster position="top-right" richColors />
         </ThemeProvider>

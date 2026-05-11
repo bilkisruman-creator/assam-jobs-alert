@@ -5,14 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { SearchModal } from '@/components/search-modal';
+import { MegaMenu } from '@/components/mega-menu';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
@@ -22,52 +16,82 @@ import {
 import {
   Search,
   Menu,
-  ChevronDown,
   Briefcase,
-  Award,
-  IdCard,
   GraduationCap,
+  Bell,
+  Home,
+  ChevronDown,
+  Landmark,
+  Shield,
+  Building2,
+  Banknote,
+  Users,
+  Trophy,
+  IdCard,
   BookOpen,
   FileCheck,
   BookMarked,
-  Building2,
-  Trophy,
-  Landmark,
-  Shield,
-  Bell,
+  Calendar,
+  TrendingUp,
 } from 'lucide-react';
 
-const navItems = [
-  { label: 'Latest Jobs', href: '/category/latest-jobs', icon: Briefcase },
-  { label: 'Results', href: '/category/results', icon: Award },
-  { label: 'Admit Cards', href: '/category/admit-cards', icon: IdCard },
-  { label: 'Admissions', href: '/category/admissions', icon: GraduationCap },
-  { label: 'Scholarships', href: '/category/scholarships', icon: BookOpen },
-];
-
-const moreItems = [
-  { label: 'Answer Keys', href: '/category/answer-keys', icon: FileCheck },
-  { label: 'Syllabus', href: '/category/syllabus', icon: BookMarked },
-  { label: 'Govt Jobs', href: '/category/government-jobs', icon: Landmark },
-  { label: 'Defence Jobs', href: '/category/defence-jobs', icon: Shield },
-  { label: 'Bank Jobs', href: '/category/bank-jobs', icon: Building2 },
-  { label: 'Notifications', href: '/category/notifications', icon: Bell },
+const mobileGroups = [
+  {
+    label: 'Jobs',
+    icon: Briefcase,
+    color: '#16a34a',
+    items: [
+      { name: 'Latest Jobs', slug: 'latest-jobs', icon: Briefcase },
+      { name: 'Assam Govt Jobs', slug: 'assam-govt-jobs', icon: Landmark },
+      { name: 'Central Govt Jobs', slug: 'central-govt-jobs', icon: Building2 },
+      { name: 'Defence Jobs', slug: 'defence-jobs', icon: Shield },
+      { name: 'Bank Jobs', slug: 'bank-jobs', icon: Banknote },
+      { name: 'Walk-in Interviews', slug: 'walk-in-interviews', icon: Users },
+    ],
+  },
+  {
+    label: 'Education',
+    icon: GraduationCap,
+    color: '#0891b2',
+    items: [
+      { name: 'Results', slug: 'results', icon: Trophy },
+      { name: 'Admit Cards', slug: 'admit-cards', icon: IdCard },
+      { name: 'Admissions', slug: 'admissions', icon: GraduationCap },
+      { name: 'Scholarships', slug: 'scholarships', icon: BookOpen },
+      { name: 'Answer Keys', slug: 'answer-keys', icon: FileCheck },
+      { name: 'Syllabus', slug: 'syllabus', icon: BookMarked },
+    ],
+  },
+  {
+    label: 'More',
+    icon: Bell,
+    color: '#ea580c',
+    items: [
+      { name: 'Notifications', slug: 'notifications', icon: Bell },
+      { name: 'Important Dates', slug: 'important-dates', icon: Calendar },
+      { name: 'Exam Preparation', slug: 'exam-preparation', icon: TrendingUp },
+    ],
+  },
 ];
 
 export function SiteHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>('Jobs');
   const pathname = usePathname();
 
   return (
     <>
+      {/* Top accent line */}
+      <div className="h-0.5 bg-gradient-to-r from-green-600 via-green-500 to-emerald-400" />
+
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-14 md:h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <Briefcase className="h-4.5 w-4.5 text-white" />
+              <div className="w-9 h-9 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center shadow-sm">
+                <Briefcase className="h-5 w-5 text-white" />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-base md:text-lg leading-tight text-green-700 dark:text-green-500">
@@ -79,38 +103,20 @@ export function SiteHeader() {
               </div>
             </Link>
 
-            {/* Desktop Nav */}
+            {/* Desktop Nav with Mega Menu */}
             <nav className="hidden lg:flex items-center gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    pathname === item.href
-                      ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                    More <ChevronDown className="ml-1 h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {moreItems.map((item, i) => (
-                    <DropdownMenuItem key={item.href} asChild>
-                      <Link href={item.href} className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link
+                href="/"
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === '/'
+                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
+              >
+                <Home className="h-3.5 w-3.5 inline mr-1" />
+                Home
+              </Link>
+              <MegaMenu />
             </nav>
 
             {/* Actions */}
@@ -134,25 +140,87 @@ export function SiteHeader() {
                     <span className="sr-only">Menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-72">
+                <SheetContent side="right" className="w-80 p-0">
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                  <div className="flex flex-col gap-1 mt-4">
-                    <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent font-medium" onClick={() => setMobileOpen(false)}>
-                      Home
-                    </Link>
-                    {[...navItems, ...moreItems].map((item) => (
+                  <div className="flex flex-col h-full">
+                    {/* Mobile header */}
+                    <div className="p-4 border-b bg-gradient-to-r from-green-600 to-green-700 text-white">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                          <Briefcase className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">Assam Jobs Alert</p>
+                          <p className="text-[10px] text-green-100">Navigate to</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Home link */}
+                    <div className="p-2">
                       <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent ${
-                          pathname === item.href ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 font-medium' : ''
+                        href="/"
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-accent font-medium text-sm ${
+                          pathname === '/' ? 'bg-green-50 text-green-700 dark:bg-green-900/30' : ''
                         }`}
                         onClick={() => setMobileOpen(false)}
                       >
-                        <item.icon className="h-4 w-4" />
-                        {item.label}
+                        <Home className="h-4 w-4" />
+                        Home
                       </Link>
-                    ))}
+                    </div>
+
+                    {/* Category groups */}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2 pb-4">
+                      {mobileGroups.map((group) => {
+                        const GroupIcon = group.icon;
+                        const isExpanded = expandedGroup === group.label;
+
+                        return (
+                          <div key={group.label} className="mb-1">
+                            <button
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-accent text-sm font-semibold"
+                              onClick={() => setExpandedGroup(isExpanded ? null : group.label)}
+                            >
+                              <div
+                                className="w-6 h-6 rounded-md flex items-center justify-center"
+                                style={{ backgroundColor: group.color + '15' }}
+                              >
+                                <GroupIcon className="h-3.5 w-3.5" style={{ color: group.color }} />
+                              </div>
+                              {group.label}
+                              <ChevronDown
+                                className={`h-4 w-4 ml-auto transition-transform ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`}
+                              />
+                            </button>
+                            {isExpanded && (
+                              <div className="ml-3 pl-3 border-l-2 space-y-0.5 mt-0.5" style={{ borderColor: group.color + '30' }}>
+                                {group.items.map((item) => {
+                                  const ItemIcon = item.icon;
+                                  return (
+                                    <Link
+                                      key={item.slug}
+                                      href={`/category/${item.slug}`}
+                                      className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-accent ${
+                                        pathname === `/category/${item.slug}`
+                                          ? 'bg-green-50 text-green-700 dark:bg-green-900/30 font-medium'
+                                          : 'text-muted-foreground'
+                                      }`}
+                                      onClick={() => setMobileOpen(false)}
+                                    >
+                                      <ItemIcon className="h-4 w-4" />
+                                      {item.name}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </SheetContent>
               </Sheet>
